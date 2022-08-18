@@ -1,4 +1,3 @@
-from msilib.schema import Directory
 import pandas as pd
 
 import sys
