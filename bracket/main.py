@@ -5,6 +5,8 @@ import bracket as br
 import tipping as tip
 import pandas as pd
 
+import json
+
 import time
 
 R_DICT = {
@@ -20,15 +22,14 @@ R_DICT = {
 
 def get_players(names: list,
                 players: list,
-                ratings: pd.DataFrame,
-                set_ratings: pd.DataFrame) -> list:
+                ratings: pd.DataFrame) -> list:
     out = []
     for name in names:
         if name == "BYE":
             out.append(name)
         else:
             player = gl.search_players(name, players)
-            player.set_rating(ratings, set_ratings)
+            player.set_rating(ratings)
             out.append(player)
 
     return out
@@ -71,15 +72,20 @@ def format_df(results: pd.DataFrame, set=False) -> pd.DataFrame:
 
 def main():
     now = time.time()
-    path = "C:/Users/cefpe/tennis/glicko"
+
+    with open("./settings.json") as cfg:
+        settings = json.load(cfg)
+
+    path = settings['data_path']
     tour = sys.argv[1]
 
     print("loading players...")
     players = gl.load_players(path, tour)
 
+    path = settings['rating_path']
+
     print("loading ratings...")
     ratings = gl.load_ratings(path, tour)
-    set_ratings = gl.load_set_ratings(path, tour)
 
     print(time.time() - now)
 
@@ -96,8 +102,7 @@ def main():
                 current_players = br.load_players(tour, command.split()[1])
                 current_players = get_players(current_players,
                                             players,
-                                            ratings,
-                                            set_ratings)
+                                            ratings)
 
                 print('running simulation...')
                 results = br.monte(current_players, 10000)
@@ -112,8 +117,7 @@ def main():
                 current_players = br.load_players(tour, command.split()[1])
                 current_players = get_players(current_players,
                                             players,
-                                            ratings,
-                                            set_ratings)
+                                            ratings)
                 results = br.monte(current_players, 10000, set=True)
                 df = format_df(results, set=True)
                 print(df.to_string())
@@ -127,8 +131,7 @@ def main():
             try:
                 current_players = get_players(current_players,
                                               players,
-                                              ratings,
-                                              set_ratings)
+                                              ratings)
             except Exception as e:
                 print(e)
                 continue
