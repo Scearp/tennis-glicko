@@ -1,4 +1,7 @@
 import sqlalchemy as sql
+
+import database as db
+
 import json
 import sys
 
@@ -12,7 +15,7 @@ def add_index(engine, name, column):
     engine.execute(index)
 
 def main():
-    with open("./database/config.json") as cfg:
+    with open("./glicko/config.json") as cfg:
         config = json.load(cfg)
 
     columns = [" ".join(t) for t in zip(config['columns'], config['datatypes'])]
@@ -25,13 +28,7 @@ def main():
     with open("./settings.json") as cfg:
         settings = json.load(cfg)
 
-    database = "mysql://{user}:{password}@{host}/tennis"
-
-    database = database.format(user=settings['sql_user'],
-                               password=settings['sql_password'],
-                               host=settings['sql_host'])
-
-    engine = sql.create_engine(database)
+    engine = db.create_engine(settings)
     engine.execute(init_command)
 
     add_index(engine, "date", "tourney_date")

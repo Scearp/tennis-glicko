@@ -128,7 +128,7 @@ def get_matches(date, con=conn):
     next_date = utils.string_to_date(date)
     next_date += timedelta(days=7)
     next_date = utils.date_to_string(next_date)
-    com1 = "select tourney_date, winner_id, loser_id, match_score from wta_match"
+    com1 = "select tourney_date, winner_id, loser_id, score from wta_match"
     com2 = "where tourney_date>='{date}'".format(date=date)
     com3 = "and tourney_date<'{date}'".format(date=next_date)
     com4 = "and tourney_name not like '%Fed Cup%'"
