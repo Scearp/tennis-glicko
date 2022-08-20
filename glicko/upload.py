@@ -1,36 +1,40 @@
-import sqlalchemy as mysql
+import sqlalchemy as sql
 import pandas as pd
 
+import database as db
+
 import time
+import json
+
+def upload_year(year, level_string, data_path, columns):
+    print(year, level_string)
+    path = "{path}/tennis_wta/{level}_{year}.csv"
+    path = path.format(path=data_path,
+                       level=level_string,
+                       year=year)
+
+    df = pd.read_csv(path, usecols=columns, encoding='latin1')
+    df.to_sql('wta_match', engine, if_exists="append", index=False)
+
 
 start_time = time.time()
 
-engine = mysql.create_engine("mysql://***REMOVED***:***REMOVED******REMOVED***@***REMOVED***/tennis")
+with open("./settings.json") as cfg:
+    settings = json.load(cfg)
+
+engine = db.create_engine(settings)
 engine.execute("truncate table wta_match")
 
-cols = ["tourney_name", "tourney_date", "winner_id", "loser_id", "score", "surface", "round", "tourney_level", "draw_size"]
+with open("./glicko/config.json") as cfg:
+    config = json.load(cfg)
 
-start = 1968
-end = 2022
+columns = config['columns'][1:]
 
-for y in range(start, end + 1):
-    print(y, "main draw")
-    df = pd.read_csv("./tennis_wta/wta_matches_{year}.csv".format(year=y), usecols=cols)
-    df.columns = ['tourney_name', 'match_surface', "draw_size", 'level', 'tourney_date', 'winner_id', 'loser_id', 'match_score', 'round']
+start_year = 1968
+end_year = 2022
 
-    df.to_sql('wta_match', engine, if_exists='append', index=False)
-
-for y in range(start, end + 1):
-    print(y, "qualies itf")
-    df = pd.read_csv("./tennis_wta/wta_matches_qual_itf_{year}.csv".format(year=y), usecols=cols, encoding='latin1')
-
-    df.columns = ['tourney_name', 'match_surface', "draw_size", 'level', 'tourney_date', 'winner_id', 'loser_id', 'match_score', 'round']
-
-    df.to_sql('wta_match', engine, if_exists='append', index=False)
-
-#print('live')
-#df = pd.read_csv('./live_wta.csv', usecols=cols)
-#df.columns = ['tourney_name', 'match_surface', 'level', 'tourney_date', 'winner_id', 'loser_id', 'match_score', 'round']
-#df.to_sql('wta_match', engine, if_exists='append', index=False)
+for y in range(start_year, end_year + 1):
+    upload_year(y, 'wta_matches', settings['data_path'], columns)
+    upload_year(y, 'wta_matches_qual_itf', settings['data_path'], columns)
 
 print(time.time() - start_time)
