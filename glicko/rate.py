@@ -26,7 +26,7 @@ def parse_score(raw_score):
     score = []
     try:
         for set in raw_score.split(" "):
-            if set == "RET" or set == "Def.":
+            if set.upper() in ["RET", "DEF.", "DEF"]:
                 score = score[ :-1]
                 score.append(1)
             else:
@@ -47,21 +47,25 @@ def parse_score(raw_score):
         return np.nan
 
 def nth_sets(matches, n):
-    matches.score = [str(s) for s in matches.score]
-    matches.score = [parse_score(s) for s in matches.score]
-    matches.score = [str(s) for s in matches.score]
-    winner_sets = matches[matches.score.apply(lambda x: x[n] == "1")]
-    loser_sets = matches[matches.score.apply(lambda x: x[n] == "0")]
+    sets = matches.copy()
+    sets.score = sets.score.apply(lambda x: str(parse_score(str(x))))
 
-    winners = [winner for winner in loser_sets.loser_id]
-    losers = [loser for loser in loser_sets.winner_id]
+    sets.score = sets.score.apply(lambda x: x[n])
 
-    loser_sets.winner_id = winners
-    loser_sets.loser_id = losers
+    sets_won = sets[sets.score == '1'].copy()
+    sets_lost = sets[sets.score == '0'].copy()
 
-    sets = pd.concat([winner_sets, loser_sets])
+    temp = sets_lost.winner_id.copy()
+
+    sets_lost.winner_id = sets_lost.loser_id
+    sets_lost.loser_id = temp
+
+    sets = pd.concat([sets_won, sets_lost])
     sets = sets.sort_values("tourney_date")
     sets = sets.reset_index(drop=True)
+
+    sets.winner_id = sets.winner_id.apply(lambda x: int(x))
+    sets.loser_id = sets.loser_id.apply(lambda x: int(x))
 
     return sets
 
@@ -189,6 +193,12 @@ def get_matches(date, arg="", con=conn):
         print("{date}: no matches".format(date=date))
 
     return df
+
+def get_sets(matches, set):
+    if matches.empty:
+        return matches
+    sets = nth_sets(matches, set)
+    return sets
         
 def nth_sets_yearly(args):
     matches = args[0]

@@ -8,26 +8,25 @@ class Player:
         self.name = name.upper() if isinstance(name, str) else None
         self.country = country.upper() if isinstance(country, str) else None
 
-    def set_rating(self, ratings: DataFrame, set_rats: DataFrame) -> None:
+    def set_rating(self, ratings: DataFrame) -> None:
         df = ratings[ratings['player_id'] == self.id]
         tdf = df[df['mode'] == 'match']
         try:
             self.rating = list(tdf['rating'])[0]
+            self.deviation = list(tdf['deviation'])[0]
         except:
-            (print(self.surname))
-        self.deviation = list(tdf['deviation'])[0]
+            print(self.surname)
 
-        df = set_rats[set_rats['player_id'] == self.id]
-        use_cols = ['set1_rating', 'set2_rating', 'set3_rating']
-        cols = [list(df[c])[0] for c in use_cols]
+        self.set_ratings = []
+        self.set_deviations = []
 
-        self.set_ratings = [cols[0], cols[1], cols[2]]
-        self.set_ratings[2] = (self.set_ratings[2] + self.rating) // 2
-
-        use_cols = ['set1_rd', 'set2_rd', 'set3_rd']
-        cols = [list(df[c])[0] for c in use_cols]
-
-        self.set_deviations = [cols[0], cols[1], cols[2]]
+        for i in range(1, 4):
+            tdf = df[df['mode'] == f"set_{i}"]
+            try:
+                self.set_ratings.append(list(tdf['rating'])[0])
+                self.set_deviations.append(list(tdf['deviation'])[0])
+            except:
+                print(self.surname)
 
     def __str__(self):
         return f"{self.name[0]}. {self.surname}"

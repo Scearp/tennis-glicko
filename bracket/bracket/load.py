@@ -1,7 +1,7 @@
 import glicko as gl
 
 def load_players(tour: str, name: str) -> list:
-    filename = f"./{tour}/{name}.txt"
+    filename = f"./bracket/{tour}/{name}.txt"
 
     with open(filename, 'r') as txt:
         rows = txt.readlines()
