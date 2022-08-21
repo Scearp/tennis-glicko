@@ -182,16 +182,6 @@ def get_sets(matches, set):
         return matches
     sets = nth_sets(matches, set)
     return sets
-        
-def nth_sets_yearly(args):
-    matches = args[0]
-    n = args[1]
 
-    sets = nth_sets(matches, n)
-
-    return sets
-
-def yearly_matches(args):
-    return args[0]
 
 

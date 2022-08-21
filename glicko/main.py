@@ -25,7 +25,6 @@ def main():
 
     for date in dates:
         matches = rate.get_matches(date, engine)
-        print(date, len(matches))
         rate.update_ratings(matches, ratings)
         rate.remove_inactive_players(ratings, 5)
         rate.update_rating_file("match", date, ratings, 160, f)
