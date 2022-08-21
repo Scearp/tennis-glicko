@@ -1,0 +1,7 @@
+*.pyc
+*.json
+*.csv
+
+**/__pycache__
+bracket/wta
+venv
