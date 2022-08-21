@@ -1,7 +1,7 @@
 pandas
 pyarrow
-mysql-connector-python
 numpy
 sqlalchemy
 mysqlclient
 matplotlib
+pymysql
