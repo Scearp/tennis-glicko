@@ -19,8 +19,8 @@ def odds(players: list):
         set_2.append(gl.get_set_expectation(m[0], m[1], 1))
         set_3.append(gl.get_set_expectation(m[0], m[1], 2))
 
-        s2w = set_2[-1] + 0.05
-        s2l = set_2[-1] - 0.05
+        s2w = min(1, set_2[-1] + 0.05)
+        s2l = min(1, set_2[-1] - 0.05)
 
         straights.append(set_1[-1] * s2w)
         decider.append(set_1[-1] * (1 - s2w) * set_3[-1] + 
@@ -33,8 +33,8 @@ def odds(players: list):
         set_2.append(1 - set_2[-1])
         set_3.append(1 - set_3[-1])
 
-        s2w = set_2[-1] + 0.05
-        s2l = set_2[-1] - 0.05
+        s2w = min(1, set_2[-1] + 0.05)
+        s2l = min(1, set_2[-1] - 0.05)
 
         straights.append(set_1[-1] * s2w)
         decider.append(set_1[-1] * (1 - s2w) * set_3[-1] + 
