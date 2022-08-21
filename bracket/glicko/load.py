@@ -28,6 +28,11 @@ def load_ratings(path: str, tour: str) -> pd.DataFrame:
 
     return df
 
+def load_rating_history(path: str, tour: str) -> pd.DataFrame:
+    table = csv.read_csv(f"{path}/{tour}.csv")
+
+    return table.to_pandas()
+
 def load_set_ratings(path: str, tour: str) -> pd.DataFrame:
     rating_file = f"{path}/{tour}_ratings.csv"
 
