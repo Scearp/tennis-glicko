@@ -1,26 +1,10 @@
 import pandas as pd
 import glicko2 as gl
 import numpy as np
-import mysql.connector as msql
 
 from datetime import datetime, timedelta
 
-import time
-
 import utils
-import copy
-
-def read_matches(dir, start_year, end_year):
-    matches = []
-    columns = ["tourney_name", "tourney_date",
-               "winner_id", "loser_id", "score"]
-    for year in range(start_year, end_year + 1):
-        file = "{dir}/wta_matches_{year}.csv".format(dir=dir, year=year)
-        matches.append(pd.read_csv(file, usecols=columns))
-        file2 = "{dir}/wta_matches_qual_itf_{year}.csv".format(dir=dir, year=year)
-        matches.append(pd.read_csv(file2, usecols=columns, encoding="latin1"))
-
-    return pd.concat(matches).sort_values("tourney_date").reset_index(drop=True)
 
 def parse_score(raw_score):
     score = []
@@ -170,11 +154,7 @@ def calculate_ratings(date, matches, players, set=None, f=None):
 
         return players
 
-conn = msql.connect(host='localhost', user='root', password='Butterlands23')
-curs = conn.cursor()
-curs.execute("use tennis")
-
-def get_matches(date, arg="", con=conn):
+def get_matches(date, engine):
     next_date = utils.string_to_date(date)
     next_date += timedelta(days=7)
     next_date = utils.date_to_string(next_date)
@@ -182,14 +162,17 @@ def get_matches(date, arg="", con=conn):
     com2 = "where tourney_date>='{date}'".format(date=date)
     com3 = "and tourney_date<'{date}'".format(date=next_date)
 
-    com = " ".join([com1, com2, com3, arg])
+    com = " ".join([com1, com2, com3])
 
-    curs.execute(com)
-    df = pd.DataFrame(curs.fetchall())
+    df = pd.read_sql(com, engine)
+
     try:
         df.columns = ['tourney_date', 'winner_id', 'loser_id', 'score']
         df = df[df.score.apply(lambda x: utils.is_valid_score(x))]
     except:
+        print("{date}: no matches".format(date=date))
+
+    if len(df) == 0:
         print("{date}: no matches".format(date=date))
 
     return df
