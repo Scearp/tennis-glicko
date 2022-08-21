@@ -42,12 +42,12 @@ def monday(date):
 
     return date_to_string(date)
 
-def get_dates(start_date, end_date):
+def get_dates(start_date, end_date, time_delta):
     dates = [start_date]
     date = string_to_date(start_date)
 
-    while date_to_string(date) != end_date:
-        date += timedelta(days=7)
+    while date_to_string(date) <= end_date:
+        date += time_delta
         dates.append(date_to_string(date))
 
     return dates
