@@ -2,7 +2,7 @@ import pandas as pd
 import glicko2 as gl
 import numpy as np
 
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import utils
 
@@ -33,18 +33,17 @@ def parse_score(raw_score):
 def nth_sets(matches, n):
     sets = matches.copy()
     sets.score = sets.score.apply(lambda x: str(parse_score(str(x))))
-
     sets.score = sets.score.apply(lambda x: x[n])
 
-    sets_won = sets[sets.score == '1'].copy()
-    sets_lost = sets[sets.score == '0'].copy()
+    sets_to_winner = sets[sets.score == '1'].copy()
+    sets_to_loser = sets[sets.score == '0'].copy()
 
-    temp = sets_lost.winner_id.copy()
+    #swapping loser_id and winner_id columns in sets where the loser of the match won.
+    temp = sets_to_loser.winner_id.copy()
+    sets_to_loser.winner_id = sets_to_loser.loser_id
+    sets_to_winner.loser_id = temp
 
-    sets_lost.winner_id = sets_lost.loser_id
-    sets_lost.loser_id = temp
-
-    sets = pd.concat([sets_won, sets_lost])
+    sets = pd.concat([sets_to_winner, sets_to_loser])
     sets = sets.sort_values("tourney_date")
     sets = sets.reset_index(drop=True)
 
@@ -55,23 +54,25 @@ def nth_sets(matches, n):
 
 def get_dates(start_year, end_year, time_delta):
     start_date = "{year}-01-01".format(year=start_year)
-    start_date = utils.string_to_date(utils.monday(start_date))
-    start_date = utils.date_to_string(start_date)
-
-    end_date = "{year}-01-01".format(year=end_year + 1)
-    end_date = utils.string_to_date(utils.monday(end_date))
-    end_date -= time_delta
-    end_date = utils.date_to_string(end_date)
+    start_date = utils.monday(start_date)
 
     if end_year == 2022:
-        end_date = datetime.today()
-        end_date = utils.date_to_string(end_date)
-        end_date = utils.monday(end_date)
+        limit_date = datetime.today().date()
+    else:
+        limit_date = utils.monday(f"{end_year + 1}-01-01")
+
+    i = 1
+
+    while start_date + i * time_delta < limit_date:
+        i += 1
+
+    end_date = start_date + i * time_delta
+
+    start_date = utils.date_to_string(start_date)
+    end_date = utils.date_to_string(end_date)
 
     dates = utils.get_dates(start_date, end_date, time_delta)
 
-    if end_year == 2022:
-        return dates[:-1]
     return dates  
 
 def update_ratings(matches, players={}):

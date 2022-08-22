@@ -3,18 +3,6 @@ import pandas as pd
 
 from datetime import datetime, timedelta
 
-def read_matches(dir, start_year, end_year):
-    matches = []
-    columns = ["tourney_name", "tourney_date",
-               "winner_id", "loser_id", "score"]
-    for year in range(start_year, end_year + 1):
-        file = "{dir}/wta_matches_{year}.csv".format(dir=dir, year=year)
-        matches.append(pd.read_csv(file, usecols=columns))
-        file2 = "{dir}/wta_matches_qual_itf_{year}.csv".format(dir=dir, year=year)
-        matches.append(pd.read_csv(file2, usecols=columns, encoding="latin1"))
-
-    return pd.concat(matches).sort_values("tourney_date").reset_index(drop=True)
-
 def string_to_date(date):
     date = str(date).split("-")
 
@@ -40,36 +28,17 @@ def monday(date):
     date = string_to_date(date)
     date = date - timedelta(days=date.weekday())
 
-    return date_to_string(date)
+    return date
 
 def get_dates(start_date, end_date, time_delta):
     dates = [start_date]
     date = string_to_date(start_date)
 
-    while date_to_string(date) <= end_date:
+    while date_to_string(date) < end_date:
         date += time_delta
         dates.append(date_to_string(date))
 
     return dates
-
-def is_valid_tournament(tourney_name):
-    if "BJK" in tourney_name: return False
-    if "Fed Cup" in tourney_name: return False
-    if "Davis Cup" in tourney_name: return False
-
-    #if "W10" in tourney_name: return False
-    #if "W15" in tourney_name: return False
-    #if "W25" in tourney_name: return False
-    #if "W50" in tourney_name: return False
-    #if "W60" in tourney_name: return False
-
-    #if "10K" in tourney_name: return False
-    #if "15K" in tourney_name: return False
-    #if "25K" in tourney_name: return False
-    #if "50K" in tourney_name: return False
-    #if "60K" in tourney_name: return False
-
-    return True
 
 def is_valid_score(score):
     if score == None: return False
