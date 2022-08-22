@@ -41,7 +41,7 @@ def nth_sets(matches, n):
     #swapping loser_id and winner_id columns in sets where the loser of the match won.
     temp = sets_to_loser.winner_id.copy()
     sets_to_loser.winner_id = sets_to_loser.loser_id
-    sets_to_winner.loser_id = temp
+    sets_to_loser.loser_id = temp
 
     sets = pd.concat([sets_to_winner, sets_to_loser])
     sets = sets.sort_values("tourney_date")
