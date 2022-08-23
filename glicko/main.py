@@ -39,7 +39,10 @@ def main():
             sets = rate.get_sets(matches, i)
             rate.update_ratings(sets, set_ratings[i])
             rate.remove_inactive_players(set_ratings[i], 5, period)
-            rate.update_rating_file(f"set_{i+1}", date, set_ratings[i], 160, f)
+            if i == 2:
+                rate.update_rating_file(f"set_{i+1}", date, set_ratings[i], 240, f)
+            else:
+                rate.update_rating_file(f"set_{i+1}", date, set_ratings[i], 160, f)
 
 if __name__ == "__main__":
     start = time.time()

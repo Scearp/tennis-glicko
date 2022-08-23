@@ -1,6 +1,8 @@
 import glicko as gl
 import pandas as pd
 
+import math
+
 def odds(players: list):
     matches = [[players[2*i], players[2*i+1]] for i in range(len(players)//2)]
     match = []
@@ -10,6 +12,14 @@ def odds(players: list):
     set_1 = []
     set_2 = []
     set_3 = []
+
+    for p in [i for i in players if i != 'BYE']:
+        if p.deviation >= 70 or p.set_deviations[-1] >= 100:
+            p.set_ratings[-1] += p.rating - 290
+            p.set_ratings[-1] /= 2
+
+            p.set_deviations[-1] = p.set_deviations[-1] ** 2 + p.deviation ** 2 + 73 ** 2
+            p.set_deviations[-1] = math.sqrt(p.set_deviations[-1])
 
     for m in matches:
         match.append(gl.get_expectation(m[0], m[1]))
