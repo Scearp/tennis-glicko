@@ -1,6 +1,7 @@
 *.pyc
 *.json
 *.csv
+*.exe
 
 **/__pycache__
 bracket/wta
