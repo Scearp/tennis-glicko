@@ -28,7 +28,6 @@ int main(int argc, char **argv) {
 
     int i;
     glicko_player *players = malloc(sizeof(glicko_player) * (player_ids[0] + 1));
-    glicko_player *old_players = malloc(sizeof(glicko_player) * (player_ids[0] + 1));
 
     for (i=0; i<=player_ids[0]; i++) {
         players[i].id = player_ids[i];
@@ -38,6 +37,8 @@ int main(int argc, char **argv) {
         players[i].opponents = malloc(sizeof(player_tuple) * 32);
         players[i].opponents[0].id = 0;
         players[i].outcomes = malloc(sizeof(double) * 32);
+        players[i].inactive = 0;
+        players[i].has_played = 0;
     }
 
     int a, b, j, k;
@@ -56,24 +57,26 @@ int main(int argc, char **argv) {
                 printf("%i\n", last_date);
             }
             for (j=0; j<=players[0].id; j++) {
-                old_players[j] = players[j];
-            }
-            for (j=0; j<=players[0].id; j++) {
+                if (players[j].inactive >= 52 * 10) {
+                    remove_int_from_array(players[j].id, player_ids);
+                    remove_player_from_array(players[j].id, players);
+                }
                 if (is_int_in_array(players[j].id, weekly_players)) {
+                    players[j].inactive = 0;
+                    players[j].has_played = 1;
                     player_update(&players[j]);
                     player_remove_opponents(&players[j]);
                     fprintf(out, "%i,%i,%i,%i\n",
                                 last_date, players[j].id, (int) player_get_rating(players[j]), (int) player_get_deviation(players[j]));
                     fflush(out);
                 } else {
-                    player_dnc(&players[j]);
+                    if (players[j].has_played != 0) {
+                        player_dnc(&players[j]);
+                    }
                 }
             }
             for (j=0; j<=weekly_players[0]; j++) {
                 weekly_players[j] = 0;
-            }
-            for (j=0; j<=players[0].id; j++) {
-                old_players[j] = players[j];
             }
         }
 
@@ -86,8 +89,8 @@ int main(int argc, char **argv) {
             }
         }
 
-        player_add_opponent(&players[a], &old_players[b], 1.0);
-        player_add_opponent(&players[b], &old_players[a], 0.0);
+        player_add_opponent(&players[a], &players[b], 1.0);
+        player_add_opponent(&players[b], &players[a], 0.0);
 
         if (!is_int_in_array(player_ids[a], weekly_players)) {
             weekly_players[0] += 2;
@@ -114,7 +117,6 @@ int main(int argc, char **argv) {
     
     free(player_ids);
     free(players);
-    free(old_players);
     free(weekly_players);
     free(matches);
     fclose(out);

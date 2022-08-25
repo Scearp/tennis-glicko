@@ -9,7 +9,7 @@ typedef struct match {
 } match; 
 
 typedef struct glicko_player {
-    int id;
+    int id, inactive, has_played;
     double rating, deviation, volatility;
     double *outcomes;
     struct player_tuple *opponents;

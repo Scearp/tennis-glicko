@@ -20,6 +20,30 @@ int is_int_in_array(int n, int array[]) {
     return 0;
 }
 
+void remove_player_from_array(int player_id, glicko_player array[]) {
+    int i, j;
+    for (i=1; i<=array[0].id; i++) {
+        if (array[i].id == player_id) {
+            for (j=i; j<array[0].id; j++) {
+                array[j] = array[j+1];
+            }
+        }
+    }
+    array[0].id--;
+}
+
+void remove_int_from_array(int player_id, int array[]) {
+    int i, j;
+    for (i=1; i<=array[0]; i++) {
+        if (array[i] == player_id) {
+            for (j=i; j<array[0]; j++) {
+                array[j] = array[j+1];
+            }
+        }
+    }
+    array[0]--;
+}
+
 int *read_csv(const char *filename) {
     int array_size = sizeof(int) * 3 * 10000000;
     int *ints = malloc(array_size);
@@ -197,6 +221,9 @@ void player_update(glicko_player *player) {
 }
 
 void player_dnc(glicko_player *player) {
+    if (player->has_played != 0) {
+        player->inactive += 2;
+    }
     player_prepare(player);
 }
 

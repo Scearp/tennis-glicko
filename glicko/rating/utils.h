@@ -12,6 +12,8 @@ double player_get_rating(glicko_player player);
 double player_get_deviation(glicko_player player);
 
 void player_prepare(glicko_player player);
+void remove_int_from_array(int player_id, int array[]);
+void remove_player_from_array(int player_id, glicko_player array[]);
 
 double player_g(glicko_player opponent);
 double player_expected(glicko_player player, glicko_player opponent);
