@@ -46,23 +46,17 @@ def main():
     df.score = df.score.apply(lambda x: str(db.parse_score(str(x))))
     df = df[df.score.apply(lambda x: db.is_valid_score(x))]
 
-    df['mode'] = [0] * len(df)
-
-    dfs = [df]
-
     for i in range(3):
         sdf = db.nth_sets(df, i)
 
-        sdf['mode'] = [i+1] * len(sdf)
 
-        dfs.append(sdf.copy())
+        sdf = sdf.drop('score', axis=1)
 
-    df = pd.concat(dfs)
+        sdf.to_csv(f"./mode_{i+1}.csv", index=False, header=False)
 
     df = df.drop('score', axis=1)
 
-    df = df.sort_values(by='tourney_date')
-    df.to_csv("./matches.csv", index=False)
+    df.to_csv("./mode_0.csv", index=False, header=False)
 
     print(time.time() - start_time)
 

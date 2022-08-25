@@ -5,14 +5,19 @@
 #define PI 3.1415926535897
 
 typedef struct match {
-    int date, winner, loser, mode;
+    int date, winner, loser;
 } match; 
 
 typedef struct glicko_player {
     int id;
     double rating, deviation, volatility;
     double *outcomes;
-    struct glicko_player *opponents;
+    struct player_tuple *opponents;
 } glicko_player;
+
+typedef struct player_tuple {
+    int id;
+    double rating, deviation, volatility;
+} player_tuple;
 
 #endif

@@ -1,13 +1,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 
 #include "utils.h"
 
-int main() {
+int main(int argc, char **argv) {
     clock_t start = clock();
 
-    int *raw_data = read_csv("wta_matches.csv");
+    char *mode1 = malloc(sizeof(char) * 50);
+    char *mode2 = malloc(sizeof(char) * 50);
+    strcpy(mode1, argv[1]);
+    strcpy(mode2, mode1);
+
+    char in_file[] = "mode_";
+    char out_file[] = "ratings_";
+    char in_file_type[] = ".csv";
+    char out_file_type[] = ".csv";
+
+    strcat(in_file, mode1);
+    strcat(in_file, in_file_type);
+
+    int *raw_data = read_csv(in_file);
     int *player_ids = get_players(raw_data);
     match *matches = get_matches(raw_data);
     free(raw_data);
@@ -21,9 +35,9 @@ int main() {
         players[i].rating = 0;
         players[i].deviation = 350.0 / 173.7178;
         players[i].volatility = 0.06;
-        players[i].opponents = malloc(sizeof(glicko_player) * 16);
+        players[i].opponents = malloc(sizeof(player_tuple) * 32);
         players[i].opponents[0].id = 0;
-        players[i].outcomes = malloc(sizeof(double) * 16);
+        players[i].outcomes = malloc(sizeof(double) * 32);
     }
 
     int a, b, j, k;
@@ -31,7 +45,10 @@ int main() {
     int *weekly_players = malloc(sizeof(int) * (player_ids[0] + 1));
     weekly_players[0] = 0;
 
-    FILE *out = fopen("ratings.csv", "w");
+    strcat(out_file, mode2);
+    strcat(out_file, out_file_type);
+
+    FILE *out = fopen(out_file, "w");
 
     for (i=1; i<=matches[0].winner; i++) {
         if (matches[i].date != last_date) {
@@ -90,7 +107,7 @@ int main() {
         for (k=0; k<=players[0].id; k++) {
             if (weekly_players[j] == players[k].id) {
                 fprintf(out, "%i,%i,%i,%i\n",
-                    last_date, players[k].id, player_get_rating(players[k]), player_get_deviation(players[k]));
+                    last_date, players[k].id, (int) player_get_rating(players[k]), (int) player_get_deviation(players[k]));
             }
         }
     }
