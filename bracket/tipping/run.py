@@ -13,6 +13,9 @@ def odds(players: list):
     set_2 = []
     set_3 = []
 
+    e_straights = []
+    e_decider = []
+
     for p in [i for i in players if i != 'BYE']:
         if p.deviation >= 70 or p.set_deviations[-1] >= 100:
             p.set_ratings[-1] += p.rating - 290
@@ -36,6 +39,9 @@ def odds(players: list):
         decider.append(set_1[-1] * (1 - s2w) * set_3[-1] + 
                        (1 - set_1[-1]) * s2l * set_3[-1])
 
+        e_straights.append(straights[-1] * 4 + decider[-1] * 3)
+        e_decider.append(straights[-1] * 3 + decider[-1] * 5)
+
         match.append(1 - match[-1])
         match_set.append(1 - match_set[-1])
 
@@ -50,6 +56,9 @@ def odds(players: list):
         decider.append(set_1[-1] * (1 - s2w) * set_3[-1] + 
                        (1 - set_1[-1]) * s2l * set_3[-1])
 
+        e_straights.append(straights[-1] * 4 + decider[-1] * 3)
+        e_decider.append(straights[-1] * 3 + decider[-1] * 5)
+
     df = pd.DataFrame([players,
                        match,
                        set_1,
@@ -57,9 +66,11 @@ def odds(players: list):
                        set_3,
                        match_set,
                        straights,
-                       decider]).T
+                       decider,
+                       e_straights,
+                       e_decider]).T
 
-    df.columns = ['name', 'match', 'set_1', 'set_2', 'set_3', 'match_set', '2-0', '2-1']
+    df.columns = ['name', 'match', 'set_1', 'set_2', 'set_3', 'match_set', '2-0', '2-1', 'E2', 'E3']
     return df
 
 
