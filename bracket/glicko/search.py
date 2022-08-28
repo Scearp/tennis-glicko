@@ -31,6 +31,9 @@ def search_players(query: str, players: list) -> Player:
     
     full_matches = [p for p in matches if p.name == name[1]]
 
+    if name[1] == None:
+        raise ValueError(f"Multiple matches found for player {query}")
+
     if len(full_matches) == 0:
         print(f"Player {query} not found. Searching similar given names...")
         partial_matches = [p for p in matches if name[1] in p.name]

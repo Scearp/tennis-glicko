@@ -100,17 +100,21 @@ def main():
                 now = time.time()
                 print("loading bracket...")
                 current_players = br.load_players(tour, command.split()[1])
-                current_players = get_players(current_players,
-                                            players,
-                                            ratings)
+                try:
+                    current_players = get_players(current_players,
+                                                players,
+                                                ratings)
 
-                print('running simulation...')
-                results = br.monte(current_players, 10000)
-                df = format_df(results)
-                print(df.to_string())
-                last = list(df.columns)[-1]
-                print(df[df[last] > 0.02].sort_values(last, ascending=False))
-                print(f"simulation took {time.time() - now} seconds.")
+                    print('running simulation...')
+                    results = br.monte(current_players, 10000)
+                    df = format_df(results)
+                    print(df.to_string())
+                    last = list(df.columns)[-1]
+                    print(df[df[last] > 0.02].sort_values(last, ascending=False))
+                    print(f"simulation took {time.time() - now} seconds.")
+                except Exception as e:
+                    print(e)
+                    continue
             elif command.split()[2] == 's':
                 now = time.time()
                 print("loading bracket...")
@@ -132,12 +136,12 @@ def main():
                 current_players = get_players(current_players,
                                               players,
                                               ratings)
+
+                print(tip.odds(current_players).to_string())
+                print(f"odds took {time.time() - now} seconds.")
             except Exception as e:
                 print(e)
                 continue
-            print(tip.odds(current_players).to_string())
-            print(f"odds took {time.time() - now} seconds.")
-        
 
 if __name__ == '__main__':
     main()
